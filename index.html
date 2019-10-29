@@ -7,6 +7,7 @@
       left: 0;
       top: 0;
       margin: 0;
+      z-index: -1;
     }
 
     body {
@@ -15,11 +16,9 @@
 
     #buttons {
       bottom: 30%;
-      position: fixed;
       display: flex;
       z-index: 10;
       left: 15%;
-      width: 70%;
       justify-content: space-evenly;
     }
 
@@ -64,14 +63,7 @@
       opacity: 1;
     }
 
-    #test {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100px;
-      height: 100px;
-      background-color: tomato;
-    }
+  
 
     #display-container {
       display: flex;
@@ -80,7 +72,6 @@
     }
 
     #display {
-      position: absolute;
       top: 30%;
       height: 512px;
       width: 512px;
