@@ -1,8 +1,9 @@
-import { Particle } from './Particle';
+import {
+    Particle
+} from './Particle';
 import * as tf from '@tensorflow/tfjs';
-import Dropzone from 'dropzone';
 
-const particles: Array<Particle> = [];
+const particles: Array < Particle > = [];
 const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
 const context = canvas.getContext('2d');
 const worker = new Worker('./worker.ts');
@@ -11,11 +12,15 @@ const captureCanvas = document.getElementById('capture') as HTMLCanvasElement;
 const captureCanvasContext = captureCanvas.getContext('2d');
 const introImg = document.getElementById('static-img') as HTMLImageElement;
 
+const exportButton = document.getElementById("export") as HTMLButtonElement;
+const styleButtons = document.getElementById("styles") as HTMLButtonElement;
+
 const htmlBody = document.getElementsByTagName('body')[0] as HTMLBodyElement;
 const userInputFile = document.getElementById('userImgFile') as HTMLInputElement;
 
 let mouseX = 0;
 let mouseY = 0;
+let isLoading  = false;
 
 let snapshot = false;
 
@@ -47,7 +52,7 @@ htmlBody.addEventListener('mousemove', (e: MouseEvent) => {
  */
 const drawVideo = () => {
     captureCanvasContext.drawImage(video, 80, 0, 480, 480, 0, 0, 512, 512);
-    if(!snapshot){
+    if (!snapshot) {
         requestAnimationFrame(drawVideo);
     }
 }
@@ -71,12 +76,12 @@ const animation = () => {
  */
 window.onload = () => {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight; 
+    canvas.height = window.innerHeight;
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 500; i++) particles.push(new Particle());
+
     requestAnimationFrame(animation);
-    //captureCanvas.style.display = 'block';
     main();
 };
 
@@ -97,7 +102,7 @@ document.getElementById("inputs").addEventListener('click', () => {
  * Input Event: User upload image
  */
 userInputFile.addEventListener('change', (e: Event) => {
-    const target= event.target as HTMLInputElement;
+    const target = event.target as HTMLInputElement;
     const files = target.files;
     const usrimg = document.createElement("img");
     usrimg.src = URL.createObjectURL(files[0]);
@@ -118,27 +123,41 @@ userInputFile.addEventListener('change', (e: Event) => {
 /**
  * Export Event: export cartoonGAN output
  */
-document.getElementById("export").addEventListener("click", async () => {
-    let img = tf.browser.fromPixels(captureCanvas);
-    img = tf.image.resizeBilinear(img, [256, 256]);
-    img = img.div(127.5).sub(1);
-    let imgData = await img.data();
-    worker.postMessage({imgData});
+exportButton.addEventListener("click", async () => {
+    if (!isLoading) {
+        let img = tf.browser.fromPixels(captureCanvas);
+        img = tf.image.resizeBilinear(img, [256, 256]);
+        img = img.div(127.5).sub(1);
+        let imgData = await img.data();
+        worker.postMessage({
+            imgData
+        });
+    }
 })
 
 worker.addEventListener('message', (e) => {
-    const resData = e.data.res;
-    let res = tf.tensor(resData, [256, 256, 3]);
-    res = res.reshape([256, 256, 3]);
-    //@ts-ignore
-    tf.browser.toPixels(res, captureCanvas);
+    const data = e.data;
+    if (!data.model) {
+        const resData = e.data.res;
+        let res = tf.tensor(resData, [256, 256, 3]);
+        res = res.reshape([256, 256, 3]);
+        //@ts-ignore
+        tf.browser.toPixels(res, captureCanvas);
+    } else {
+        styleButtons.innerText = data.model;
+        styleButtons.className = "button";
+        exportButton.className = "button";
+        isLoading = true;
+    }
+
 })
 
 
 const main = async () => {
     //@ts-ignore
-    video.srcObject = await navigator.mediaDevices.getUserMedia({video: true})
-    requestAnimationFrame(drawVideo);    
-    
-};
+    video.srcObject = await navigator.mediaDevices.getUserMedia({
+        video: true
+    })
+    requestAnimationFrame(drawVideo);
 
+};
