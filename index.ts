@@ -15,6 +15,7 @@ const introImg = document.getElementById('static-img') as HTMLImageElement;
 const exportButton = document.getElementById("export") as HTMLButtonElement;
 const styleButtons = document.getElementById("styles") as HTMLButtonElement;
 const webcamButton = document.getElementById("webcam") as HTMLButtonElement;
+const snapshotButton = document.getElementById('snapshot') as HTMLButtonElement;
 const uploadButton = document.getElementById("upload") as HTMLButtonElement;
 
 const htmlBody = document.getElementsByTagName('body')[0] as HTMLBodyElement;
@@ -63,7 +64,7 @@ const drawVideo = () => {
  * Background animation
  */
 const animation = () => {
-    context.fillStyle = 'black';
+    context.fillStyle = 'rgb(0, 0, 0, 0.3)';
     context.fillRect(0, 0, canvas.width, canvas.height);
     particles.forEach((it: Particle) => {
         it.update();
@@ -92,10 +93,15 @@ window.onload = () => {
  * Input Event: Snapshot form webcam stream video
  */
 webcamButton.addEventListener('click', () => {
-    snapshot = true;
+    // snapshot = true;
     captureCanvas.style.display = 'block';
-    video.style.display = 'none';
+    snapshotButton.style.display = 'block';
     introImg.style.display = 'none';
+});
+
+snapshotButton.addEventListener('click', () => {
+    snapshot = true;
+    video.style.display = 'none';
 });
 
 

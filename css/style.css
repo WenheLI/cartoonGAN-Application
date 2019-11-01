@@ -27,10 +27,7 @@
   #buttons {
     position: absolute;
     display: flex;
-    width:512px;
-    /* padding-left: 30%;
-    padding-right: 30%; */
-    
+    width:512px;    
     justify-content: space-between;
   }
 
@@ -94,6 +91,7 @@
     height: 512px;
     width: 512px;
     border-radius: 10px;
+    /* justify-content: center; */
   }
 
   #stream {
@@ -133,18 +131,22 @@
     border-radius: 6%;
   }
 
-  
 
 #userInput{
   display: none;
 }
 
 .cambutton{
+  position: absolute;
+  z-index: 200;
   display: none;
+  bottom: 6%;
+  left: 45%;
   width: 60px;
   height: 60px;
-  background-color: red;
-  border-radius: 30%;
+  background-color: rgb(210, 0, 0);
+  border-radius: 50%;
+  border:6px solid lightgrey;
 }
 
 

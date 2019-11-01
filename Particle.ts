@@ -14,7 +14,7 @@ class Particle {
         this.y = Math.random() * window.innerHeight;
         this.velX = Math.random() * 2 - 1;
         this.velY = Math.random() * 2 - 1;
-        this.s = 3;
+        this.s = Math.floor(Math.random() * 9) + 1;
 
         this.r = Math.floor(Math.random() * 70) + 100;
         this.g = Math.floor(Math.random() * 110) + 90;
