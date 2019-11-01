@@ -12,7 +12,8 @@
     "velocity-animate": "^2.0.5"
   },
   "scripts": {
-    "start": "npx parcel serve index.html"
+    "start": "npx parcel serve index.html",
+    "build": "npx parcel build index.html"
   },
   "staticFiles": {
     "staticPath": "static",
