@@ -1,0 +1,113 @@
+#canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    z-index: -1;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #button-container{
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height:100;
+    justify-content: center;
+    bottom:10%;
+    z-index: 100;
+  }
+
+  #buttons {
+    position: absolute;
+    display: flex;
+    width:512px;
+    /* padding-left: 30%;
+    padding-right: 30%; */
+    
+    justify-content: space-between;
+  }
+
+  .button {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+    border: none;
+    color: black;
+    opacity: .5;
+    border-radius: 10px;
+    padding: 16px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s;
+    /* animation */
+    transition-duration: 0.4s;
+    cursor: pointer;
+    font-family: 'Bowlby One SC', cursive;
+  }
+
+  .button:active {
+    border: none;
+  }
+
+  .button:hover {
+    border: none;
+    background-color: rgb(114, 13, 228);
+    color: white;
+    opacity: 1;
+  }
+
+  .button:visited {
+    border: none;
+    background-color: rgb(37, 10, 70);
+    color: rgb(190, 190, 190);
+    opacity: 1;
+  }
+
+
+  #display-container {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  #display {
+    position: absolute;
+    margin-top: 3%;
+    height: 512px;
+    width: 512px;
+    border-radius: 10px;
+  }
+
+  #stream {
+    position: absolute;
+    z-index: 10;
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+
+
+  #static-img {
+    position: absolute;
+    z-index: 100;
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  #capture{
+    position: relative;
+    z-index: 50;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
