@@ -12,16 +12,19 @@
   <div id="display-container">
     <div id="display">
       <video autoplay id="stream"></video>
-      <img id="static-img" src="img/pitch.png"/>
+      <img id="static-img" src="img/intro.png"/>
       <canvas id="capture" width="512" height="512"></canvas>
+      <div id="displayframe"></div>
     </div>
+    <button class="cambutton" id="snapshot"> </button>
   </div>
 
   <div id="button-container">
     <div id = "buttons">
       <button class="button loading" id="styles">Loading Models</button>
-      <button class="button" id="inputs">INPUTS</button>
-      <input type="file" class="button" id="userImgFile">
+      <button class="button" id="webcam">WEBCAM</button>
+      <button class="button" id="upload">UPLOAD</button>
+      <input type="file" id="userInput">
       <button class="button loading" id="export">EXPORT</button>
     </div>  
   </div>
