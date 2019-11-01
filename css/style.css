@@ -155,4 +155,14 @@
   border:6px solid lightgrey;
 }
 
+.cambutton:hover {
+  width: 65px;
+  height: 65px;
+}
+
+.cambutton:active {
+  width: 60px;
+  height: 60px;
+  background-color: rgb(160, 0, 0);
+}
 

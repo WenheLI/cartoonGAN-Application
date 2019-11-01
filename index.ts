@@ -25,7 +25,7 @@ let mouseX = 0;
 let mouseY = 0;
 let isLoading  = true;
 
-let snapshot = false;
+let snap = false;
 
 /**
  * Dynamic esponse to window resize
@@ -55,7 +55,7 @@ htmlBody.addEventListener('mousemove', (e: MouseEvent) => {
  */
 const drawVideo = () => {
     captureCanvasContext.drawImage(video, 80, 0, 480, 480, 0, 0, 512, 512);
-    if (!snapshot) {
+    if (!snap) {
         requestAnimationFrame(drawVideo);
     }
 }
@@ -90,17 +90,21 @@ window.onload = () => {
 
 
 /**
- * Input Event: Snapshot form webcam stream video
+ * Input Event: Snapshot from webcam stream video
  */
 webcamButton.addEventListener('click', () => {
-    // snapshot = true;
-    captureCanvas.style.display = 'block';
-    snapshotButton.style.display = 'block';
-    introImg.style.display = 'none';
+    if(snap){
+        snap = false;
+        requestAnimationFrame(drawVideo);
+    } else {
+        captureCanvas.style.display = 'block';
+        snapshotButton.style.display = 'block';
+        introImg.style.display = 'none';
+    }
 });
 
 snapshotButton.addEventListener('click', () => {
-    snapshot = true;
+    snap = true;
     video.style.display = 'none';
 });
 
@@ -117,7 +121,7 @@ userInput.addEventListener('change', (e: Event) => {
     const files = target.files;
     const usrimg = document.createElement("img");
     usrimg.src = URL.createObjectURL(files[0]);
-    snapshot = true;
+    snap = true;
 
     usrimg.onload = () => {
         captureCanvasContext.drawImage(usrimg, 0, 0, 512, 512);
