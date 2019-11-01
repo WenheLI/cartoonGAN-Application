@@ -10,6 +10,10 @@
     margin: 0;
   }
 
+  .loading:hover {
+    cursor: wait;
+  }
+
   #button-container{
     position: absolute;
     display: flex;
@@ -63,7 +67,7 @@
 
   .button:hover {
     border: none;
-    background-color: rgb(114, 13, 228);
+    background-color: rgb(100, 13, 235);
     color: white;
     opacity: 1;
   }
@@ -80,6 +84,7 @@
     position: absolute;
     display: flex;
     width: 100%;
+    height: 70%;
     justify-content: center;
   }
 
@@ -103,7 +108,7 @@
   #static-img {
     position: absolute;
     z-index: 100;
-    display: none;
+    display: block;
     width: 100%;
     height: 100%;
   }
@@ -111,11 +116,35 @@
   #capture{
     position: relative;
     z-index: 50;
-    display: block;
+    display: none;
     width: 100%;
     height: 100%;
   }
 
-  .loading:hover {
-    cursor: wait;
+  #displayframe {
+    position: absolute;
+    z-index: 150;
+    display: block;
+    top: -11px;
+    left: -11px;
+    width: 104%;
+    height: 104%;
+    border: 12px solid black;
+    border-radius: 6%;
   }
+
+  
+
+#userInput{
+  display: none;
+}
+
+.cambutton{
+  display: none;
+  width: 60px;
+  height: 60px;
+  background-color: red;
+  border-radius: 30%;
+}
+
+

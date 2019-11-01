@@ -14,9 +14,11 @@ const introImg = document.getElementById('static-img') as HTMLImageElement;
 
 const exportButton = document.getElementById("export") as HTMLButtonElement;
 const styleButtons = document.getElementById("styles") as HTMLButtonElement;
+const webcamButton = document.getElementById("webcam") as HTMLButtonElement;
+const uploadButton = document.getElementById("upload") as HTMLButtonElement;
 
 const htmlBody = document.getElementsByTagName('body')[0] as HTMLBodyElement;
-const userInputFile = document.getElementById('userImgFile') as HTMLInputElement;
+const userInput = document.getElementById('userInput') as HTMLInputElement;
 
 let mouseX = 0;
 let mouseY = 0;
@@ -89,8 +91,7 @@ window.onload = () => {
 /**
  * Input Event: Snapshot form webcam stream video
  */
-document.getElementById("inputs").addEventListener('click', () => {
-    // captureCanvasContext.drawImage(video, 0, 0, 512, 512);
+webcamButton.addEventListener('click', () => {
     snapshot = true;
     captureCanvas.style.display = 'block';
     video.style.display = 'none';
@@ -101,7 +102,11 @@ document.getElementById("inputs").addEventListener('click', () => {
 /**
  * Input Event: User upload image
  */
-userInputFile.addEventListener('change', (e: Event) => {
+uploadButton.addEventListener('click', () => {
+    userInput.click();
+})
+
+userInput.addEventListener('change', (e: Event) => {
     const target = event.target as HTMLInputElement;
     const files = target.files;
     const usrimg = document.createElement("img");
@@ -116,8 +121,6 @@ userInputFile.addEventListener('change', (e: Event) => {
     }
 
 });
-
-
 
 
 /**
