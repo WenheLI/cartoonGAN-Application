@@ -20,7 +20,7 @@ const userInputFile = document.getElementById('userImgFile') as HTMLInputElement
 
 let mouseX = 0;
 let mouseY = 0;
-let isLoading  = false;
+let isLoading  = true;
 
 let snapshot = false;
 
@@ -147,7 +147,7 @@ worker.addEventListener('message', (e) => {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
         exportButton.className = "button";
-        isLoading = true;
+        isLoading = false;
     }
 
 })
