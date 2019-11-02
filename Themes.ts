@@ -8,12 +8,21 @@ const Miyazaki: ColorTheme = [
     [128, 166, 133]
 ]
 
+const Miyazaki2: ColorTheme = [
+    [78, 22, 23],
+    [20, 36, 26],
+    [201, 129, 81],
+    [217, 177, 143],
+    [124, 39, 42]
+]
+
 interface Dictionary {
     [Key: string]: ColorTheme;
 }
 
 const themes: Dictionary = {
-    Miyazaki
+    Miyazaki,
+    Miyazaki2
 }
 
 export {

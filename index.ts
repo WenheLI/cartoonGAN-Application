@@ -89,7 +89,7 @@ window.onload = () => {
     canvas.height = window.innerHeight;
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki']));
+    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki2']));
 
     requestAnimationFrame(animation);
     main();
@@ -102,6 +102,7 @@ window.onload = () => {
 webcamButton.addEventListener('click', () => {
     if(snap){
         snap = false;
+        snapshotButton.style.display = 'block';
         requestAnimationFrame(drawVideo);
     } else {
         captureCanvas.style.display = 'block';
@@ -145,6 +146,7 @@ userInput.addEventListener('change', (e: Event) => {
  */
 exportButton.addEventListener("click", async () => {
     exporting = true;
+    snapshotButton.style.display = 'none';
     if (!isLoading) {
         let img = tf.browser.fromPixels(captureCanvas);
         img = tf.image.resizeBilinear(img, [256, 256]);
