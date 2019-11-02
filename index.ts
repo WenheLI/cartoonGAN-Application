@@ -2,6 +2,8 @@ import {
     Particle
 } from './Particle';
 import * as tf from '@tensorflow/tfjs';
+import { themes } from './Themes';
+import { sqrt, fill } from '@tensorflow/tfjs';
 
 const particles: Array < Particle > = [];
 const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
@@ -21,8 +23,8 @@ const uploadButton = document.getElementById("upload") as HTMLButtonElement;
 const htmlBody = document.getElementsByTagName('body')[0] as HTMLBodyElement;
 const userInput = document.getElementById('userInput') as HTMLInputElement;
 
-let mouseX = 0;
-let mouseY = 0;
+let mouseX = window.innerWidth/2;
+let mouseY = window.innerHeight/2;
 let isLoading  = true;
 
 let snap = false;
@@ -46,8 +48,6 @@ window.addEventListener('resize', (e: Event) => {
 htmlBody.addEventListener('mousemove', (e: MouseEvent) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    // console.log("mouseX - " + mouseX + ",  mouseY - " + mouseY);
-
 });
 
 /**
@@ -69,6 +69,11 @@ const animation = () => {
     particles.forEach((it: Particle) => {
         it.update();
         it.draw(context);
+
+        if( distance(it.x, it.y, mouseX, mouseY) < 300 && it.s > 7 ){
+            it.line(context, mouseX, mouseY);            
+        }
+
     });
     requestAnimationFrame(animation);
 }
@@ -82,7 +87,7 @@ window.onload = () => {
     canvas.height = window.innerHeight;
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < 500; i++) particles.push(new Particle());
+    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki']));
 
     requestAnimationFrame(animation);
     main();
@@ -95,6 +100,8 @@ window.onload = () => {
 webcamButton.addEventListener('click', () => {
     if(snap){
         snap = false;
+        captureCanvas.width = 512;
+        captureCanvas.height = 512;
         requestAnimationFrame(drawVideo);
     } else {
         captureCanvas.style.display = 'block';
@@ -138,6 +145,8 @@ userInput.addEventListener('change', (e: Event) => {
  */
 exportButton.addEventListener("click", async () => {
     if (!isLoading) {
+        exportButton.innerText = "EXPORTING";
+        exportButton.className = "button loading";
         let img = tf.browser.fromPixels(captureCanvas);
         img = tf.image.resizeBilinear(img, [256, 256]);
         img = img.div(127.5).sub(1);
@@ -156,6 +165,8 @@ worker.addEventListener('message', (e) => {
         res = res.reshape([256, 256, 3]);
         //@ts-ignore
         tf.browser.toPixels(res, captureCanvas);
+        exportButton.className = "button";
+        exportButton.innerText = "EXPORT";
     } else {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
@@ -164,6 +175,12 @@ worker.addEventListener('message', (e) => {
     }
 
 })
+
+
+function distance(x1: number, y1: number, x2: number, y2: number){
+    let d = Math.pow((Math.pow((x1-x2),2) + Math.pow((y1-y2),2)), 0.5);
+    return d;
+}
 
 
 const main = async () => {
