@@ -28,6 +28,7 @@ let mouseY = window.innerHeight/2;
 let isLoading  = true;
 
 let snap = false;
+let exporting = false;
 
 /**
  * Dynamic esponse to window resize
@@ -64,16 +65,17 @@ const drawVideo = () => {
  * Background animation
  */
 const animation = () => {
-    context.fillStyle = 'rgb(0, 0, 0, 0.3)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if(!exporting){
+        context.fillStyle = 'rgb(0, 0, 0, 0.3)';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
     particles.forEach((it: Particle) => {
         it.update();
         it.draw(context);
-
-        if( distance(it.x, it.y, mouseX, mouseY) < 300 && it.s > 7 ){
+        if( distance(it.x, it.y, mouseX, mouseY) < 300 && it.s > 7 && !exporting){
             it.line(context, mouseX, mouseY);            
         }
-
     });
     requestAnimationFrame(animation);
 }
@@ -142,6 +144,7 @@ userInput.addEventListener('change', (e: Event) => {
  * Export Event: export cartoonGAN output
  */
 exportButton.addEventListener("click", async () => {
+    exporting = true;
     if (!isLoading) {
         let img = tf.browser.fromPixels(captureCanvas);
         img = tf.image.resizeBilinear(img, [256, 256]);
@@ -161,6 +164,8 @@ worker.addEventListener('message', (e) => {
         res = res.reshape([256, 256, 3]);
         //@ts-ignore
         tf.browser.toPixels(res, captureCanvas);
+        exporting = false;
+
     } else {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
