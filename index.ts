@@ -95,6 +95,8 @@ window.onload = () => {
 webcamButton.addEventListener('click', () => {
     if(snap){
         snap = false;
+        captureCanvas.width = 512;
+        captureCanvas.height = 512;
         requestAnimationFrame(drawVideo);
     } else {
         captureCanvas.style.display = 'block';
@@ -138,6 +140,8 @@ userInput.addEventListener('change', (e: Event) => {
  */
 exportButton.addEventListener("click", async () => {
     if (!isLoading) {
+        exportButton.innerText = "EXPORTING";
+        exportButton.className = "button loading";
         let img = tf.browser.fromPixels(captureCanvas);
         img = tf.image.resizeBilinear(img, [256, 256]);
         img = img.div(127.5).sub(1);
@@ -156,6 +160,8 @@ worker.addEventListener('message', (e) => {
         res = res.reshape([256, 256, 3]);
         //@ts-ignore
         tf.browser.toPixels(res, captureCanvas);
+        exportButton.className = "button";
+        exportButton.innerText = "EXPORT";
     } else {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
