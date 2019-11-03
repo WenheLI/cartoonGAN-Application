@@ -28,6 +28,7 @@ let mouseY = window.innerHeight/2;
 let isLoading  = true;
 
 let snap = false;
+let exporting = false;
 
 /**
  * Dynamic esponse to window resize
@@ -64,16 +65,17 @@ const drawVideo = () => {
  * Background animation
  */
 const animation = () => {
-    context.fillStyle = 'rgb(0, 0, 0, 0.3)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if(!exporting){
+        context.fillStyle = 'rgb(0, 0, 0, 0.3)';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
     particles.forEach((it: Particle) => {
         it.update();
         it.draw(context);
-
-        if( distance(it.x, it.y, mouseX, mouseY) < 300 && it.s > 7 ){
+        if( distance(it.x, it.y, mouseX, mouseY) < 300 && it.s > 7 && !exporting){
             it.line(context, mouseX, mouseY);            
         }
-
     });
     requestAnimationFrame(animation);
 }
@@ -87,7 +89,7 @@ window.onload = () => {
     canvas.height = window.innerHeight;
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki']));
+    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki2']));
 
     requestAnimationFrame(animation);
     main();
@@ -102,6 +104,7 @@ webcamButton.addEventListener('click', () => {
         snap = false;
         captureCanvas.width = 512;
         captureCanvas.height = 512;
+        snapshotButton.style.display = 'block';
         requestAnimationFrame(drawVideo);
     } else {
         captureCanvas.style.display = 'block';
@@ -144,7 +147,9 @@ userInput.addEventListener('change', (e: Event) => {
  * Export Event: export cartoonGAN output
  */
 exportButton.addEventListener("click", async () => {
+    snapshotButton.style.display = 'none';
     if (!isLoading) {
+        exporting = true;
         exportButton.innerText = "EXPORTING";
         exportButton.className = "button loading";
         let img = tf.browser.fromPixels(captureCanvas);
@@ -165,8 +170,8 @@ worker.addEventListener('message', (e) => {
         res = res.reshape([256, 256, 3]);
         //@ts-ignore
         tf.browser.toPixels(res, captureCanvas);
-        exportButton.className = "button";
-        exportButton.innerText = "EXPORT";
+        exporting = false;
+
     } else {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
