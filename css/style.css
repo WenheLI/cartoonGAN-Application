@@ -166,3 +166,13 @@
   background-color: rgb(160, 0, 0);
 }
 
+#checkbox-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+label {
+  color: white;
+}

@@ -4,7 +4,6 @@
   <link href="https://fonts.googleapis.com/css?family=Bowlby+One+SC|Exo+2&display=swap" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   <link href="css/index.scss" rel="stylesheet">
-  <link rel="manifest" href="/manifest.json">
 
 </head>
 
@@ -29,8 +28,16 @@
     </div>
 
     <button class="button loading" id="styles">Loading Models</button>
-
-    <button class="button loading" id="export">EXPORT</button>
+    <div id="checkbox-container">
+      <button class="button loading" id="export">EXPORT</button>
+      <div class="checkbox">
+        <input type="checkbox" name="" id="foreground"> <label for="foreground">foreground</label>
+      </div>
+      <div class="checkbox">
+        <input type="checkbox" name="" id="background"> <label for="backgeound">backgeound</label>
+      </div>
+    </div>
+    
   </div>
 
   <script src="./Particle.ts"></script>
