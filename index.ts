@@ -3,7 +3,7 @@ import {
 } from './Particle';
 import * as tf from '@tensorflow/tfjs';
 import { themes } from './Themes';
-import { sqrt, fill } from '@tensorflow/tfjs';
+import * as bodyPix from '@tensorflow-models/body-pix';
 
 const particles: Array < Particle > = [];
 const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
@@ -30,6 +30,26 @@ let isLoading  = true;
 let snap = false;
 let exporting = false;
 
+let isFore = false;
+let isBack = false;
+
+document.getElementById('foreground').addEventListener('change', (e: InputEvent) => {
+    isFore = e.target.checked;
+})
+
+document.getElementById('background').addEventListener('change', (e: InputEvent) => {
+    isBack = e.target.checked;
+})
+
+const fullMask = tf.ones([256, 256, 1]);
+
+const body = bodyPix.load({
+    architecture: 'ResNet50',
+    multiplier: 1,
+    outputStride: 16,
+    quantBytes: 4,
+    
+})
 /**
  * Dynamic esponse to window resize
  */
@@ -167,11 +187,25 @@ worker.addEventListener('message', (e) => {
     if (!data.model) {
         const resData = e.data.res;
         let res = tf.tensor(resData, [256, 256, 3]);
+        let img = tf.browser.fromPixels(captureCanvas);
+        img = tf.image.resizeBilinear(img, [256, 256]);
         res = res.reshape([256, 256, 3]);
-        //@ts-ignore
-        tf.browser.toPixels(res, captureCanvas);
-        exporting = false;
+        body.then(async (it) => {
+            const d = await it.segmentPerson(img, {
+                internalResolution: 'full'
+            });
+            const mask = tf.tensor(d.data, [256, 256, 1]);
+            const completeMask = fullMask.sub(mask);
+            img = img.div(255);
 
+            const foreground = isFore ? res.mul(mask) : img.mul(mask);
+            const background = isBack ? res.mul(completeMask) : img.mul(completeMask);
+            tf.browser.toPixels(foreground.add(background), captureCanvas);
+            styleButtons.className = "button";
+            exportButton.className = "button";
+            exportButton.innerText = "EXPORT";
+        })
+        exporting = false;
     } else {
         styleButtons.innerText = data.model;
         styleButtons.className = "button";
