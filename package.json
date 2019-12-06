@@ -9,6 +9,7 @@
     "@tensorflow-models/body-pix": "^2.0.3",
     "@tensorflow/tfjs": "^1.3.2",
     "dropzone": "^5.5.1",
+    "gif-encoder": "^0.7.2",
     "velocity-animate": "^2.0.5"
   },
   "scripts": {

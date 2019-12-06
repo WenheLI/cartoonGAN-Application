@@ -4,6 +4,10 @@ import {
 import * as tf from '@tensorflow/tfjs';
 import { themes } from './Themes';
 import * as bodyPix from '@tensorflow-models/body-pix';
+import GIFEncoder from 'gif-encoder';
+
+const renderCanvas = document.getElementById('renderer') as HTMLCanvasElement;
+const renderCtx = renderCanvas.getContext('2d');
 
 const particles: Array < Particle > = [];
 const canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
@@ -146,18 +150,30 @@ uploadButton.addEventListener('click', () => {
     userInput.click();
 })
 
-userInput.addEventListener('change', (e: Event) => {
+userInput.addEventListener('change',async (e: Event) => {
     const target = event.target as HTMLInputElement;
     const files = target.files;
     const usrimg = document.createElement("img");
-    usrimg.src = URL.createObjectURL(files[0]);
-    snap = true;
-
-    usrimg.onload = () => {
-        captureCanvasContext.drawImage(usrimg, 0, 0, 512, 512);
-        captureCanvas.style.display = 'block';
-        video.style.display = 'none';
-        introImg.style.display = 'none';
+    const fileURL = URL.createObjectURL(files[0]);
+    if (files[0].type === 'image/gif') {
+        const gifData = await (await fetch(fileURL)).arrayBuffer();
+        const gif = new window.GIF(gifData);
+        const frames = gif.decompressFrames(true);
+        worker.postMessage({
+            gif: frames
+        });
+        introImg.style.display = 'block';
+        introImg.src = fileURL;
+    } else {
+        usrimg.src = fileURL;
+        snap = true;
+    
+        usrimg.onload = () => {
+            captureCanvasContext.drawImage(usrimg, 0, 0, 512, 512);
+            captureCanvas.style.display = 'block';
+            video.style.display = 'none';
+            introImg.style.display = 'none';
+        }
     }
 
 });
@@ -184,7 +200,30 @@ exportButton.addEventListener("click", async () => {
 
 worker.addEventListener('message', (e) => {
     const data = e.data;
-    if (!data.model) {
+    if (data.gif) {
+        console.log(data.gif)
+        const gif = new GIFEncoder(256, 256);
+        const dataBuffer = [];
+        gif.on('data', (buf) => dataBuffer.push(buf));
+        gif.writeHeader();
+        gif.setRepeat(0);
+        gif.setDelay(data.delay);
+        Promise.all(data.gif.map((it) => {
+            const temp = tf.tensor(it, [256, 256, 3]);
+            return tf.browser.toPixels(temp);
+        })).then(d => {
+            d.forEach((it) => {
+                gif.addFrame(it)
+            });
+            gif.finish();
+            let binData = dataBuffer.reduce((prev, curr) => (__appendBuffer(prev, curr)), new ArrayBuffer(0))
+            let gifData = new Blob([binData], {"type": "image/gif"})
+            introImg.src = URL.createObjectURL(gifData);
+        })
+        window.d = dataBuffer
+        window.gif = data.gif;
+        window.tf = tf;
+    } else if (!data.model) {
         const resData = e.data.res;
         let res = tf.tensor(resData, [256, 256, 3]);
         let img = tf.browser.fromPixels(captureCanvas);
@@ -230,3 +269,10 @@ const main = async () => {
     requestAnimationFrame(drawVideo);
 
 };
+
+function __appendBuffer(buffer1, buffer2) {
+    let tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+    tmp.set(new Uint8Array(buffer1), 0);
+    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+    return tmp.buffer;
+  };
