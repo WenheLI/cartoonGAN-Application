@@ -44,7 +44,7 @@ self.addEventListener('message', (e) => {
             console.log("new model src: %s\n", newModelSrc);
             model = tf.loadGraphModel(newModelSrc);
             model.then(() => {
-                self.postMessage({model: e.data.newModelName});
+                self.postMessage({model: e.data.newModelName, reload: true});
             })
         }
         else if (e.data.gif) {

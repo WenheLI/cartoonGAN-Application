@@ -296,10 +296,12 @@ worker.addEventListener('message', (e) => {
 
     } else {
         modelName = data.model;
-        styleButton.innerText = data.model;
-        styleButton.className = "button";
-        exportButton.className = "button";
-        isLoading = false;
+        if (!data.reload) {
+            styleButton.innerText = data.model;
+            styleButton.className = "button";
+            exportButton.className = "button";
+            isLoading = false;
+        }
     }
     
     styleButton.className = "button";
