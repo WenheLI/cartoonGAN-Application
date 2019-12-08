@@ -1,6 +1,6 @@
 type ColorTheme = Array<Array<number>>;
 
-const Miyazaki: ColorTheme = [
+const miyazaki: ColorTheme = [
     [191, 207, 217],
     [189, 147, 146],
     [3, 115, 140],
@@ -8,7 +8,7 @@ const Miyazaki: ColorTheme = [
     [128, 166, 133]
 ]
 
-const Miyazaki2: ColorTheme = [
+const miyazaki2: ColorTheme = [
     [78, 22, 23],
     [20, 36, 26],
     [201, 129, 81],
@@ -21,8 +21,8 @@ interface Dictionary {
 }
 
 const themes: Dictionary = {
-    Miyazaki,
-    Miyazaki2
+    miyazaki,
+    miyazaki2
 }
 
 export {

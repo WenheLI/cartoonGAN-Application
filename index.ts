@@ -5,6 +5,7 @@ import * as tf from '@tensorflow/tfjs';
 import { themes } from './Themes';
 import * as bodyPix from '@tensorflow-models/body-pix';
 import GIFEncoder from 'gif-encoder';
+import { mod } from '@tensorflow/tfjs';
 
 const renderCanvas = document.getElementById('renderer') as HTMLCanvasElement;
 const renderCtx = renderCanvas.getContext('2d');
@@ -16,13 +17,25 @@ const worker = new Worker('./worker.ts');
 const video = document.getElementById('stream') as HTMLVideoElement;
 const captureCanvas = document.getElementById('capture') as HTMLCanvasElement;
 const captureCanvasContext = captureCanvas.getContext('2d');
-const introImg = document.getElementById('static-img') as HTMLImageElement;
+const introImg = document.getElementById("static-img") as HTMLImageElement;
 
 const exportButton = document.getElementById("export") as HTMLButtonElement;
-const styleButtons = document.getElementById("styles") as HTMLButtonElement;
 const webcamButton = document.getElementById("webcam") as HTMLButtonElement;
-const snapshotButton = document.getElementById('snapshot') as HTMLButtonElement;
+const snapshotButton = document.getElementById("snapshot") as HTMLButtonElement;
 const uploadButton = document.getElementById("upload") as HTMLButtonElement;
+const downloadDiv = document.getElementById("download-btn-container") as HTMLDivElement;
+const downloadAnchor = document.getElementById("download") as HTMLAnchorElement;
+
+/* Style buttons in style dropdown menu */
+const styleButton = document.getElementById("styles") as HTMLButtonElement;
+const paprikaButton = document.getElementById("paprika") as HTMLButtonElement;
+const shinkaiButton = document.getElementById("shinkai") as HTMLButtonElement;
+const hayaoButton = document.getElementById("hayao") as HTMLButtonElement;
+const hosodaButton = document.getElementById("hosoda") as HTMLButtonElement;
+const chihiroButton = document.getElementById("chihiro") as HTMLButtonElement;
+
+/* or? */
+const styleButtonArray = document.getElementsByClassName("dropdown-btn") as HTMLCollectionOf<Element>;
 
 const htmlBody = document.getElementsByTagName('body')[0] as HTMLBodyElement;
 const userInput = document.getElementById('userInput') as HTMLInputElement;
@@ -31,11 +44,17 @@ let mouseX = window.innerWidth/2;
 let mouseY = window.innerHeight/2;
 let isLoading  = true;
 
+let gifStruct;
+let currentInput = '';
+
 let snap = false;
 let exporting = false;
 
 let isFore = false;
 let isBack = false;
+
+/* Name of chosen model*/
+let modelName = '';
 
 document.getElementById('foreground').addEventListener('change', (e: InputEvent) => {
     isFore = e.target.checked;
@@ -93,7 +112,6 @@ const animation = () => {
         context.fillStyle = 'rgb(0, 0, 0, 0.3)';
         context.fillRect(0, 0, canvas.width, canvas.height);
     }
-    
     particles.forEach((it: Particle) => {
         it.update();
         it.draw(context);
@@ -113,7 +131,7 @@ window.onload = () => {
     canvas.height = window.innerHeight;
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['Miyazaki2']));
+    for (let i = 0; i < 600; i++) particles.push(new Particle(themes['miyazaki2']));
 
     requestAnimationFrame(animation);
     main();
@@ -124,10 +142,13 @@ window.onload = () => {
  * Input Event: Snapshot from webcam stream video
  */
 webcamButton.addEventListener('click', () => {
+    downloadDiv.style.display = 'none';
+    currentInput = "webcam";
     if(snap){
         snap = false;
         captureCanvas.width = 512;
         captureCanvas.height = 512;
+        captureCanvas.style.display = 'block';
         snapshotButton.style.display = 'block';
         requestAnimationFrame(drawVideo);
     } else {
@@ -147,36 +168,52 @@ snapshotButton.addEventListener('click', () => {
  * Input Event: User upload image
  */
 uploadButton.addEventListener('click', () => {
+    downloadDiv.style.display = 'none';
     userInput.click();
 })
 
 userInput.addEventListener('change',async (e: Event) => {
     const target = event.target as HTMLInputElement;
     const files = target.files;
-    const usrimg = document.createElement("img");
+    const usrImg = document.createElement("img");
     const fileURL = URL.createObjectURL(files[0]);
+
     if (files[0].type === 'image/gif') {
         const gifData = await (await fetch(fileURL)).arrayBuffer();
         const gif = new window.GIF(gifData);
         const frames = gif.decompressFrames(true);
-        worker.postMessage({
-            gif: frames
-        });
-        introImg.style.display = 'block';
+        gifStruct = {gif: frames};
         introImg.src = fileURL;
+        captureCanvas.style.display = 'none';
+        introImg.style.display = 'block';
+        currentInput = "gif";
     } else {
-        usrimg.src = fileURL;
+        usrImg.src = fileURL;
         snap = true;
     
-        usrimg.onload = () => {
-            captureCanvasContext.drawImage(usrimg, 0, 0, 512, 512);
+        usrImg.onload = () => {
+            captureCanvasContext.drawImage(usrImg, 0, 0, 512, 512);
             captureCanvas.style.display = 'block';
             video.style.display = 'none';
             introImg.style.display = 'none';
         }
+        currentInput = "img";
     }
 
 });
+
+
+/**
+ * Choose a style from dropdown menu
+ * Send the chosen style to worker with a "modelSwitch" tag
+ */
+for(let styleBtn of styleButtonArray){
+    styleBtn.addEventListener("click", async => {
+        console.log("Initiate style change to %s\n", styleBtn.id);
+        modelName = styleBtn.id;
+        worker.postMessage({tag: "modelSwitch", newModelName: styleBtn.id});
+    });
+}
 
 
 /**
@@ -187,16 +224,26 @@ exportButton.addEventListener("click", async () => {
     if (!isLoading) {
         exporting = true;
         exportButton.innerText = "EXPORTING";
-        exportButton.className = "button loading";
-        let img = tf.browser.fromPixels(captureCanvas);
-        img = tf.image.resizeBilinear(img, [256, 256]);
-        img = img.div(127.5).sub(1);
-        let imgData = await img.data();
-        worker.postMessage({
-            imgData
-        });
+        exportButton.className = "button_loading";
+
+        switch(currentInput){
+            case "gif":
+                /* gif: gifStruct from processed user input */
+                console.log(gifStruct);
+                worker.postMessage(gifStruct);
+                break;
+            default:
+                /* img/webcam: grab pixels from captureCanvas*/
+                let img = tf.browser.fromPixels(captureCanvas);
+                img = tf.image.resizeBilinear(img, [256, 256]);
+                img = img.div(127.5).sub(1);
+                let imgData = await img.data();
+                worker.postMessage({
+                    imgData
+                });
+        }
     }
-})
+});
 
 worker.addEventListener('message', (e) => {
     const data = e.data;
@@ -219,10 +266,10 @@ worker.addEventListener('message', (e) => {
             let binData = dataBuffer.reduce((prev, curr) => (__appendBuffer(prev, curr)), new ArrayBuffer(0))
             let gifData = new Blob([binData], {"type": "image/gif"})
             introImg.src = URL.createObjectURL(gifData);
+            downloadAnchor.setAttribute("href", URL.createObjectURL(gifData));
         })
-        window.d = dataBuffer
-        window.gif = data.gif;
-        window.tf = tf;
+        downloadReady();
+        
     } else if (!data.model) {
         const resData = e.data.res;
         let res = tf.tensor(resData, [256, 256, 3]);
@@ -239,20 +286,33 @@ worker.addEventListener('message', (e) => {
 
             const foreground = isFore ? res.mul(mask) : img.mul(mask);
             const background = isBack ? res.mul(completeMask) : img.mul(completeMask);
-            tf.browser.toPixels(foreground.add(background), captureCanvas);
-            styleButtons.className = "button";
-            exportButton.className = "button";
-            exportButton.innerText = "EXPORT";
-        })
-        exporting = false;
+
+            await tf.browser.toPixels(foreground.add(background), captureCanvas);
+            captureCanvas.toBlob((b) => {
+                downloadAnchor.setAttribute("href", URL.createObjectURL(b));
+            }, "image/png");
+        });
+        downloadReady();
+
     } else {
-        styleButtons.innerText = data.model;
-        styleButtons.className = "button";
+        modelName = data.model;
+        styleButton.innerText = data.model;
+        styleButton.className = "button";
         exportButton.className = "button";
         isLoading = false;
     }
-
+    
+    styleButton.className = "button";
+    exportButton.className = "button";
+    exportButton.innerText = "EXPORT";
+    exporting = false;
 })
+
+
+function downloadReady(){
+    downloadAnchor.setAttribute("download", modelName.concat("-").concat((new Date()).getTime().toString()));
+    downloadDiv.style.display = "block";
+}
 
 
 function distance(x1: number, y1: number, x2: number, y2: number){
@@ -265,7 +325,8 @@ const main = async () => {
     //@ts-ignore
     video.srcObject = await navigator.mediaDevices.getUserMedia({
         video: true
-    })
+    });
+    downloadDiv.style.display = "none";
     requestAnimationFrame(drawVideo);
 
 };
