@@ -211,8 +211,9 @@ for(let styleBtn of styleButtonArray){
     styleBtn.addEventListener("click", async => {
         console.log("Initiate style change to %s\n", styleBtn.id);
         modelName = styleBtn.id;
-        styleBtn.innerText = 'Loading';
-        styleBtn.className = styleBt.className + ' loading';
+        styleButton.innerText = 'Loading';
+        exportButton.innerText = 'Loading';
+        styleBtn.className = styleBtn.className + ' loading';
         exportButton.className = "button loading";
         styleButton.className = "button loading";
         worker.postMessage({tag: "modelSwitch", newModelName: styleBtn.id});
