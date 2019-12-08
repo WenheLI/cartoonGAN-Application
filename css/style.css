@@ -24,21 +24,20 @@
     z-index: 100;
   }
 
-  #buttons {
+  /* #buttons {
     position: absolute;
     display: flex;
     width:512px;    
     justify-content: space-between;
-  }
+  } */
 
   .button {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     background-color: white;
     color: black;
     border: 2px solid #555555;
     border: none;
-    color: black;
     opacity: .5;
     border-radius: 10px;
     padding: 0px;
@@ -54,7 +53,6 @@
     font-family: 'Bowlby One SC', cursive;
     text-align: center;
     vertical-align:middle;
-
   }
 
   .button:active {
@@ -112,7 +110,7 @@
   }
 
   #capture{
-    position: relative;
+    position: absolute;
     z-index: 50;
     display: none;
     width: 100%;
@@ -137,11 +135,11 @@
 }
 
 #bottom-buttons {
-  position: relative;
+  position: absolute;
   z-index: 200;
   width: 100%;
   height: 60px;
-  bottom: 80px;
+  bottom: 40px;
   display: flex;
   justify-content: center;
 }
@@ -173,6 +171,95 @@
   justify-content: center;
 }
 
+/* #export{
+  position: absolute;
+  top: 50%;
+} */
+
 label {
   color: white;
+}
+
+#download-btn-container {
+  transition: .5s ease;
+  position: absolute;
+  z-index: 300;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+#download-btn-container:hover{
+  opacity: 0.6;
+  background-color: rgb(0,0,0);
+}
+
+#download-btn-container:hover #download-btn{
+  opacity: 1;
+}
+
+#download-btn {
+  transition: .5s ease;
+  opacity: 0;
+  width:15%;
+  height:15%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+#download-btn-img {
+  position: absolute;
+  widows: 100%;
+  height: 100%;
+}
+
+.style-dropdown { 
+  position: relative;
+  display: inline-block;
+}
+
+.style-dropdown-content {
+  display: none;
+  position: absolute;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-btn {
+  width: 120px;
+  height: 50px;
+  background-color: rgb(144, 88, 230);
+  color: black;
+  border: 2px solid #555555;
+  border: none;
+  opacity: .5;
+  border-radius: 6px;
+  padding: 0px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 15px;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s;
+  /* animation */
+  transition-duration: 0.4s;
+  cursor: pointer;
+  font-family: 'Bowlby One SC', cursive;
+  text-align: center;
+  vertical-align:middle;
+}
+
+.style-dropdown-content .dropdown-btn:hover {
+  opacity: 1;
+}
+
+.style-dropdown:hover .style-dropdown-content {
+  display: block;
+}
+
+.style-dropdown:hover .button_loading {
+  background-color: rgb(100, 13, 235);
 }

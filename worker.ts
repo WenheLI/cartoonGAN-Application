@@ -1,6 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 // @ts-ignore
-const model = tf.loadGraphModel("/hayao/model.json");
+let model = tf.loadGraphModel("/hayao/model.json");
 
 const processGIF = (frames, model) => {
     const tempOffscreen = new OffscreenCanvas(1, 1);
@@ -31,13 +31,23 @@ const processGIF = (frames, model) => {
 model.then(() => {
     // @ts-ignore
     self.postMessage({
-        model: "miyazaki"
+        model: "hayao"
     });
 })
 
 self.addEventListener('message', (e) => {
     model.then(async (it) => {
-        if (e.data.gif) {
+        if(e.data.tag == "modelSwitch"){
+            let newModelSrc = '/'.concat(e.data.newModelName).concat("/model.json");
+            //newModelSrc.concat(e.data.newModelName).concat("/model.json");
+            console.log("e.data.newModelName: %s\n", e.data.newModelName);
+            console.log("new model src: %s\n", newModelSrc);
+            model = tf.loadGraphModel(newModelSrc);
+            model.then(() => {
+                self.postMessage({model: e.data.newModelName});
+            })
+        }
+        else if (e.data.gif) {
             const url = e.data.gif;
             const {frameImages, delay} = processGIF(url, it);
             const datas = frameImages.map((it) => it.data());
@@ -45,7 +55,7 @@ self.addEventListener('message', (e) => {
                 self.postMessage({
                     gif: it,
                     delay
-                })
+                });
             })
         } else {
             // @ts-ignore
