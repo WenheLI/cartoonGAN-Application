@@ -211,6 +211,10 @@ for(let styleBtn of styleButtonArray){
     styleBtn.addEventListener("click", async => {
         console.log("Initiate style change to %s\n", styleBtn.id);
         modelName = styleBtn.id;
+        styleBtn.innerText = 'Loading';
+        styleBtn.className = styleBt.className + ' loading';
+        exportButton.className = "button loading";
+        styleButton.className = "button loading";
         worker.postMessage({tag: "modelSwitch", newModelName: styleBtn.id});
     });
 }
@@ -296,10 +300,10 @@ worker.addEventListener('message', (e) => {
 
     } else {
         modelName = data.model;
+        styleButton.innerText = data.model;
+        styleButton.className = "button";
+        exportButton.className = "button";
         if (!data.reload) {
-            styleButton.innerText = data.model;
-            styleButton.className = "button";
-            exportButton.className = "button";
             isLoading = false;
         }
     }
